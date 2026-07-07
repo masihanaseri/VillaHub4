@@ -120,9 +120,9 @@ PUBLIC_SIGNUP_ENABLED = False
 
 # Django REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
@@ -167,6 +167,10 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "VillaHub API",
     "DESCRIPTION": "VillaHub Backend API",
     "VERSION": "1.0.0",
+
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True,
+    },
 }
 
 

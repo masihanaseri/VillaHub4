@@ -4,7 +4,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework import status
+from rest_framework.permissions import IsAdminUser
+from .serializers import NotificationCreateSerializer
+from townships.models import Township
 from .models import Notification
 from .serializers import NotificationSerializer
 
@@ -195,4 +198,44 @@ class NotificationViewSet(
 
             }
 
+        )
+    @action(
+        detail=False,
+        methods=["post"],
+    )
+    def create_announcement(
+        self,
+        request,
+    ):
+
+        serializer = NotificationCreateSerializer(
+            data=request.data,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        user = request.user
+
+        # فقط مدیر سیستم می‌تواند اطلاعیه سراسری بفرستد
+        if serializer.validated_data.get("is_global"):
+
+            if not user.is_superuser:
+
+                return Response(
+                    {
+                        "detail": "فقط مدیر سیستم می‌تواند اطلاعیه سراسری ثبت کند."
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
+        notification = serializer.save(
+            created_by=user,
+            recipient=user,
+        )
+
+        return Response(
+            NotificationSerializer(notification).data,
+            status=status.HTTP_201_CREATED,
         )

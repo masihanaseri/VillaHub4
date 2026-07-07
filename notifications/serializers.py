@@ -56,3 +56,24 @@ class NotificationSerializer(
             "updated_at",
 
         )
+class NotificationCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Notification
+
+        fields = [
+
+            "title",
+
+            "message",
+
+            "notification_type",
+
+            "priority",
+
+            "township",
+
+            "is_global",
+
+        ]

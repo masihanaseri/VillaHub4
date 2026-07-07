@@ -48,6 +48,25 @@ class Notification(BaseModel):
         related_name="notifications",
     )
 
+    township = models.ForeignKey(
+        "townships.Township",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+
+    is_global = models.BooleanField(
+        default=False,
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="created_notifications",
+    )
+
     title = models.CharField(
         max_length=200,
     )
@@ -141,6 +160,8 @@ class NotificationLog(BaseModel):
     receiver = models.CharField(
         max_length=255,
     )
+
+
 
     provider = models.CharField(
         max_length=100,
