@@ -4,6 +4,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import HasPermission
 from .models import Invitation, User, Membership
 from .serializers import InvitationSerializer
+from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LoginSerializer
+from drf_spectacular.utils import extend_schema
 
 
 class SetActiveTownshipView(APIView):
@@ -200,4 +206,49 @@ class AcceptInviteView(APIView):
                 "username": user.username,
             },
             status=201,
+        )
+
+@extend_schema(
+    request=LoginSerializer,
+    responses={200: None},
+)
+class LoginView(APIView):
+
+    permission_classes = []
+
+    authentication_classes = []
+
+    def post(self, request):
+
+        username = request.data.get("username")
+
+        password = request.data.get("password")
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password,
+        )
+
+        if user is None:
+
+            return Response(
+                {
+                    "detail": "نام کاربری یا رمز عبور اشتباه است."
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response(
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "full_name": user.get_full_name(),
+                },
+            }
         )

@@ -132,3 +132,6 @@ class AcceptInvitationSerializer(serializers.Serializer):
         invitation.save(update_fields=["is_used"])
 
         return user
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
