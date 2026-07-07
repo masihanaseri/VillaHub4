@@ -1,0 +1,12 @@
+Django==6.0.6
+djangorestframework==3.17.1
+django-filter==25.2
+django-cors-headers==4.9.0
+psycopg2-binary==2.9.12
+
+# Celery / Redis
+celery==5.6.3
+redis==8.0.1
+
+# Tests
+factory_boy==3.3.3

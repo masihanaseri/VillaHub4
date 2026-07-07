@@ -1,0 +1,10 @@
+from django.apps import AppConfig
+
+
+class GatesConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "gates"
+    verbose_name = "درب‌های تردد"
+
+    def ready(self):
+        from . import signals  # noqa: F401
