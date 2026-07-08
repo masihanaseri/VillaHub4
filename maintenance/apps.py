@@ -1,5 +1,17 @@
 from django.apps import AppConfig
 
 
+
+
+
 class MaintenanceConfig(AppConfig):
-    name = 'maintenance'
+
+    default_auto_field = "django.db.models.BigAutoField"
+
+    name = "maintenance"
+
+    verbose_name = "تعمیرات و خرابی"
+
+    def ready(self):
+
+        import maintenance.signals        

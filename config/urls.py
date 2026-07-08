@@ -6,6 +6,7 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from accounts.views import LoginView
 
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -69,6 +70,23 @@ urlpatterns = [
         "api/reservations/",
         include("reservations.urls"),
     ),
+
+    path(
+        "api/maintenance/",
+        include("maintenance.urls"),
+    ),
+
+    path(
+
+        "api/chat/",
+
+        include(
+
+            "chat.urls",
+
+        ),
+
+    ),    
 
     # -----------------------------
     # Accounts

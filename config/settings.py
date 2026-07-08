@@ -23,8 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'drf_spectacular',
-    'drf_spectacular_sidecar',
     'django_filters',
     'corsheaders',
     'accounts',
@@ -43,6 +41,11 @@ INSTALLED_APPS = [
     "access_control",
     "billing",
     "sms",
+    "maintenance",
+    "chat",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -186,3 +189,18 @@ SIMPLE_JWT = {
 
     "UPDATE_LAST_LOGIN": True,
 }
+
+
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+
+    "default": {
+
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+
+    }
+
+}
+

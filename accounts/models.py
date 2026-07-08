@@ -46,6 +46,20 @@ class User(AbstractUser):
         verbose_name="شهرک فعال"
     )
 
+    is_online = models.BooleanField(
+    default=False,
+)
+
+    last_seen = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    socket_id = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = "کاربر"
         verbose_name_plural = "کاربران"
