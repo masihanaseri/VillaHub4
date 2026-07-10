@@ -571,11 +571,7 @@ class ReceiptService:
 
     @staticmethod
     def render_pdf(receipt: Receipt):
-        """
-        Placeholder hook: wire up e.g. WeasyPrint/ReportLab here and
-        save into receipt.pdf_file. Left unimplemented per spec
-        ("receipts must be PDF Ready", not PDF-generating yet).
-        """
+
         raise NotImplementedError(
             "PDF rendering is not implemented yet - hook a PDF engine "
             "here and populate receipt.pdf_file."
@@ -586,12 +582,6 @@ class ReceiptService:
 # Finance report service (read-only, AI-ready aggregate queries)
 # ---------------------------------------------------------------------------
 class ReportService:
-    """
-    Pure read-side aggregate queries. No dashboard/AI implemented here
-    per spec - this class exists so a future dashboard or AI agent has
-    a single, well-defined place to pull numbers from instead of
-    querying models directly.
-    """
 
     @staticmethod
     def total_income(start_date, end_date) -> Decimal:

@@ -1,8 +1,4 @@
-"""
-DRF views. No business logic here - every non-trivial action delegates
-to billing.services. Views only: authenticate/authorize, parse input,
-call a service, shape output.
-"""
+
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters as drf_filters, status

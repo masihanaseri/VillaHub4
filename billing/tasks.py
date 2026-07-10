@@ -1,26 +1,4 @@
-"""
-توابع پس‌زمینه/دوره‌ای مربوط به Billing.
 
-این پروژه فعلاً از Celery استفاده نمی‌کند (مطابق reservations/notifications/
-gates که توابع ساده پایتون هستند)، بنابراین این توابع را می‌توان از طریق یک
-management command یا cron صدا زد. در صورت اضافه شدن Celery در آینده، کافیست
-دکوراتور @shared_task به هرکدام اضافه شود، مثلاً:
-
-    CELERY_BEAT_SCHEDULE = {
-        "billing-generate-invoices": {
-            "task": "billing.tasks.generate_due_invoices",
-            "schedule": crontab(hour=1, minute=0),
-        },
-        "billing-flag-overdue-invoices": {
-            "task": "billing.tasks.flag_overdue_invoices",
-            "schedule": crontab(hour=2, minute=0),
-        },
-        "billing-apply-automatic-penalties": {
-            "task": "billing.tasks.apply_automatic_penalties",
-            "schedule": crontab(hour=3, minute=0),
-        },
-    }
-"""
 import logging
 
 from billing.models import Invoice, InvoiceStatus

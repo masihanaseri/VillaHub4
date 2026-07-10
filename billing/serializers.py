@@ -1,7 +1,4 @@
-"""
-DRF serializers. Pure I/O shaping and field-level validation only -
-anything cross-field or stateful is delegated to billing.services.
-"""
+
 from rest_framework import serializers
 
 from billing.models import (

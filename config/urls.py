@@ -1,11 +1,16 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
-from drf_spectacular.views import SpectacularAPIView
-from drf_spectacular.views import SpectacularSwaggerView
-from accounts.views import LoginView
+from wallets.callback_views import (
+    payment_success_page,
+    payment_failed_page,
+)
 
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+)
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -13,13 +18,27 @@ from rest_framework_simplejwt.views import (
 )
 
 from accounts.views import (
-    SetActiveTownshipView,
+    LoginView,
     SignupView,
+    SetActiveTownshipView,
     CreateInvitationView,
     AcceptInviteView,
 )
 
 urlpatterns = [
+
+    # =====================================================
+    # Admin
+    # =====================================================
+
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+
+    # =====================================================
+    # API Documentation
+    # =====================================================
 
     path(
         "api/schema/",
@@ -29,9 +48,49 @@ urlpatterns = [
 
     path(
         "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
+        SpectacularSwaggerView.as_view(
+            url_name="schema",
+        ),
         name="swagger-ui",
-    ),    
+    ),
+
+    # =====================================================
+    # Authentication
+    # =====================================================
+
+    path(
+        "api/auth/login/",
+        LoginView.as_view(),
+        name="login",
+    ),
+
+    path(
+        "api/auth/signup/",
+        SignupView.as_view(),
+        name="signup",
+    ),
+
+    path(
+        "api/auth/set-township/",
+        SetActiveTownshipView.as_view(),
+        name="set-township",
+    ),
+
+    path(
+        "api/auth/invite/create/",
+        CreateInvitationView.as_view(),
+        name="create-invitation",
+    ),
+
+    path(
+        "api/auth/invite/<uuid:token>/accept/",
+        AcceptInviteView.as_view(),
+        name="accept-invite",
+    ),
+
+    # =====================================================
+    # JWT
+    # =====================================================
 
     path(
         "api/token/",
@@ -45,25 +104,18 @@ urlpatterns = [
         name="token_refresh",
     ),
 
-    path(
-    "api/login/",
-    LoginView.as_view(),
-    name="login",
-    ),
-
-    path(
-        "admin/",
-        admin.site.urls,
-    ),
-
-    path(
-        "dashboard/",
-        include("dashboard.urls"),
-    ),
+    # =====================================================
+    # Main API
+    # =====================================================
 
     path(
         "api/",
         include("api.urls"),
+    ),
+
+    path(
+        "api/dashboard/",
+        include("dashboard.urls"),
     ),
 
     path(
@@ -77,43 +129,18 @@ urlpatterns = [
     ),
 
     path(
-
         "api/chat/",
-
-        include(
-
-            "chat.urls",
-
-        ),
-
-    ),    
-
-    # -----------------------------
-    # Accounts
-    # -----------------------------
-
-    path(
-        "auth/signup/",
-        SignupView.as_view(),
-        name="signup",
+        include("chat.urls"),
     ),
 
     path(
-        "auth/set-township/",
-        SetActiveTownshipView.as_view(),
-        name="set-township",
+        "api/wallets/",
+        include("wallets.urls"),
     ),
 
     path(
-        "auth/invite/create/",
-        CreateInvitationView.as_view(),
-        name="create-invitation",
-    ),
-
-    path(
-        "auth/invite/<uuid:token>/accept/",
-        AcceptInviteView.as_view(),
-        name="accept-invite",
+        "api/billing/",
+        include("billing.urls"),
     ),
 
     path(
@@ -122,35 +149,23 @@ urlpatterns = [
     ),
 
     path(
-
         "api/visitors/",
-
         include("visitors.urls"),
-
     ),
 
     path(
-
         "api/gates/",
-
         include("gates.urls"),
-
     ),
 
     path(
-
         "api/guards/",
-
         include("guards.urls"),
-
     ),
 
     path(
-
         "api/access-logs/",
-
         include("access_logs.urls"),
-
     ),
 
     path(
@@ -158,12 +173,13 @@ urlpatterns = [
         include("access_control.urls"),
     ),
 
-    path(
-        "api/billing/",
-        include("billing.urls"),
-    ),
-
+    path("payment/success/", payment_success_page, name="payment-success"),
+    path("payment/failed/", payment_failed_page, name="payment-failed"),
 ]
+
+# =====================================================
+# Media
+# =====================================================
 
 if settings.DEBUG:
 

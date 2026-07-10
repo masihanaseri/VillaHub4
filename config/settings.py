@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "sms",
     "maintenance",
     "chat",
+    "wallets",
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "channels",
@@ -204,3 +205,43 @@ CHANNEL_LAYERS = {
 
 }
 
+# ==========================
+# Payment Gateways
+# ==========================
+
+PAYMENT_GATEWAYS = {
+
+    "zarinpal": {
+
+        "sandbox": True,
+
+        "merchant_id": "",
+
+        "sandbox_merchant_id": "",
+
+        "production_merchant_id": "",
+
+    },
+
+    "idpay": {
+
+        "api_key": "",
+
+        "sandbox": True,
+
+    },
+
+    "nextpay": {
+
+        "api_key": "",
+
+        "sandbox": True,
+
+    },
+
+}
+
+
+DEFAULT_CURRENCY = "IRT"
+
+DEFAULT_PAYMENT_GATEWAY = "zarinpal"
