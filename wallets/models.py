@@ -567,27 +567,7 @@ class GatewayCallback(BaseModel):
 # Withdrawal Request
 # ----------------------------------------
 
-# ----------------------------------------
-# Withdrawal Status
-# ----------------------------------------
 
-class WithdrawalStatus(models.TextChoices):
-
-    PENDING = "PENDING", "Pending"
-
-    UNDER_REVIEW = "UNDER_REVIEW", "Under Review"
-
-    APPROVED = "APPROVED", "Approved"
-
-    REJECTED = "REJECTED", "Rejected"
-
-    PROCESSING = "PROCESSING", "Processing"
-
-    COMPLETED = "COMPLETED", "Completed"
-
-    FAILED = "FAILED", "Failed"
-
-    CANCELLED = "CANCELLED", "Cancelled"
 
 
 # ----------------------------------------
@@ -601,6 +581,18 @@ class WithdrawalRequest(BaseModel):
         on_delete=models.CASCADE,
         related_name="withdraw_requests",
     )
+
+    class Status(models.TextChoices):
+
+        PENDING = "PENDING", "Pending"
+
+        APPROVED = "APPROVED", "Approved"
+
+        REJECTED = "REJECTED", "Rejected"
+
+        PAID = "PAID", "Paid"
+
+        CANCELLED = "CANCELLED", "Cancelled"
 
     wallet_transaction = models.OneToOneField(
         WalletTransaction,
@@ -616,9 +608,9 @@ class WithdrawalRequest(BaseModel):
     )
 
     status = models.CharField(
-        max_length=30,
-        choices=WithdrawalStatus.choices,
-        default=WithdrawalStatus.PENDING,
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
     )
 
     bank_name = models.CharField(
