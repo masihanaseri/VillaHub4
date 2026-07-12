@@ -1,16 +1,18 @@
+import logging
+
 import requests
 
 from .base import BasePaymentGateway
+
+logger = logging.getLogger("wallets.gateways.zarinpal")
 
 
 class ZarinPalGateway(BasePaymentGateway):
 
     SANDBOX_URL = "https://sandbox.zarinpal.com/pg/v4/payment/request.json"
-
     PRODUCTION_URL = "https://payment.zarinpal.com/pg/v4/payment/request.json"
 
     SANDBOX_VERIFY = "https://sandbox.zarinpal.com/pg/v4/payment/verify.json"
-
     PRODUCTION_VERIFY = "https://payment.zarinpal.com/pg/v4/payment/verify.json"
 
     HEADERS = {
@@ -51,41 +53,48 @@ class ZarinPalGateway(BasePaymentGateway):
             "description": description,
         }
 
-        response = requests.post(
-            self.get_request_url(sandbox),
-            json=payload,
-            headers=self.HEADERS,
-            timeout=self.TIMEOUT,
-        )
-
-        response.raise_for_status()
+        try:
+            response = requests.post(
+                self.get_request_url(sandbox),
+                json=payload,
+                headers=self.HEADERS,
+                timeout=self.TIMEOUT,
+            )
+            response.raise_for_status()
+        except requests.RequestException:
+            logger.exception("zarinpal.create_payment.request_failed")
+            raise
 
         return response.json()
 
     def verify_payment(
-            self,
-            merchant_id,
-            authority,
-            amount,
-            sandbox=False,
-        ):
+        self,
+        merchant_id,
+        authority,
+        amount,
+        sandbox=False,
+    ):
 
-            payload = {
-                "merchant_id": merchant_id,
-                "authority": authority,
-                "amount": int(amount),
-            }
+        payload = {
+            "merchant_id": merchant_id,
+            "authority": authority,
+            "amount": int(amount),
+        }
 
+        try:
             response = requests.post(
-                        self.get_verify_url(sandbox),
-                        json=payload,
-                        headers=self.HEADERS,
-                        timeout=self.TIMEOUT,
-                    )
+                self.get_verify_url(sandbox),
+                json=payload,
+                headers=self.HEADERS,
+                timeout=self.TIMEOUT,
+            )
+        except requests.RequestException:
+            logger.exception("zarinpal.verify_payment.request_failed")
+            raise
 
-            if not response.ok:
-                raise Exception(
-                    f"ZarinPal error {response.status_code}: {response.text}"
-                )
+        if not response.ok:
+            raise Exception(
+                f"ZarinPal error {response.status_code}: {response.text}"
+            )
 
-            return response.json()
+        return response.json()

@@ -8,3 +8,7 @@ class WalletsConfig(AppConfig):
     name = "wallets"
 
     verbose_name = "Wallet Management"
+
+    def ready(self):
+
+        from . import signals  # noqa: F401
