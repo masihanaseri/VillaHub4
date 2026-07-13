@@ -47,6 +47,7 @@ from .serializers import (
 )
 from .services import (
     InsufficientBalanceError,
+    NoActiveGatewayError,
     PaymentGatewayService,
     PaymentVerificationError,
     SettlementService,
@@ -166,6 +167,8 @@ class WalletViewSet(viewsets.ModelViewSet):
                 wallet_transaction,
                 request,
             )
+        except NoActiveGatewayError as exc:
+            return _error(str(exc), status.HTTP_502_BAD_GATEWAY)
         except PaymentVerificationError as exc:
             return _error(str(exc), status.HTTP_502_BAD_GATEWAY)
 
@@ -239,7 +242,7 @@ class SettlementViewSet(viewsets.ModelViewSet):
         settlement = self.get_object()
 
         try:
-            SettlementService.approve(settlement)
+            settlement = SettlementService.approve(settlement)
         except SettlementError as exc:
             return _error(str(exc))
 
@@ -252,7 +255,7 @@ class SettlementViewSet(viewsets.ModelViewSet):
         tracking_code = request.data.get("tracking_code", "")
 
         try:
-            SettlementService.pay(settlement, tracking_code)
+            settlement = SettlementService.pay(settlement, tracking_code)
         except (SettlementError, InsufficientBalanceError) as exc:
             return _error(str(exc))
 
@@ -397,7 +400,7 @@ class WithdrawalRequestViewSet(viewsets.ModelViewSet):
         withdrawal_request = self.get_object()
 
         try:
-            WithdrawalService.approve(withdrawal_request, approved_by=request.user)
+            withdrawal_request = WithdrawalService.approve(withdrawal_request, approved_by=request.user)
         except WithdrawalError as exc:
             return _error(str(exc))
 
@@ -419,7 +422,8 @@ class WithdrawalRequestViewSet(viewsets.ModelViewSet):
         except (WithdrawalError, InsufficientBalanceError) as exc:
             return _error(str(exc))
 
-        return Response(
+        data = WithdrawalRequestSerializer(withdrawal_request).data
+        data.update(
             {
                 "success": True,
                 "balance": withdrawal_request.wallet.balance,
@@ -427,6 +431,8 @@ class WithdrawalRequestViewSet(viewsets.ModelViewSet):
                 "internal_reference": wallet_transaction.internal_reference,
             }
         )
+
+        return Response(data)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated, IsFinanceStaff])
     def reject(self, request, pk=None):
@@ -436,7 +442,7 @@ class WithdrawalRequestViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         try:
-            WithdrawalService.reject(
+            withdrawal_request = WithdrawalService.reject(
                 withdrawal_request,
                 reason=serializer.validated_data["reason"],
             )

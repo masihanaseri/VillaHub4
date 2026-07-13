@@ -24,7 +24,7 @@ def wallet_transaction_saved(sender, instance, created, **kwargs):
     logger.info(
         "wallet_transaction.saved",
         extra={
-            "created": created,
+            "was_created": created,
             "internal_reference": instance.internal_reference,
             "wallet_id": instance.wallet_id,
             "status": instance.status,

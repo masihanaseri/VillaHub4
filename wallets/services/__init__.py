@@ -1,5 +1,5 @@
 from .wallet_service import WalletService, InsufficientBalanceError
-from .payment_service import PaymentGatewayService, PaymentVerificationError
+from .payment_service import NoActiveGatewayError, PaymentGatewayService, PaymentVerificationError
 from .transfer_service import TransferService
 from .refund_service import RefundService
 from .commission_service import CommissionService
@@ -12,6 +12,7 @@ __all__ = [
     "InsufficientBalanceError",
     "PaymentGatewayService",
     "PaymentVerificationError",
+    "NoActiveGatewayError",
     "TransferService",
     "RefundService",
     "CommissionService",

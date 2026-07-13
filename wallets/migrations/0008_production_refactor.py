@@ -57,14 +57,14 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name='wallet',
             constraint=models.CheckConstraint(
-                check=models.Q(balance__gte=0),
+                condition=models.Q(balance__gte=0),
                 name='wallet_balance_non_negative',
             ),
         ),
         migrations.AddConstraint(
             model_name='wallet',
             constraint=models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(wallet_type='SYSTEM')
                     | models.Q(wallet_type='TOWNSHIP', township__isnull=False)
                     | models.Q(wallet_type='RESIDENT', user__isnull=False)
@@ -160,21 +160,6 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='wallettransaction',
             index=models.Index(fields=['gateway_ref_id'], name='wallettxn_gateway_ref_idx'),
-        ),
-        migrations.AddConstraint(
-            model_name='wallettransaction',
-            constraint=models.CheckConstraint(
-                check=models.Q(('status', 'SUCCESS'), _negated=True)
-                | (models.Q(paid_at__isnull=False) & models.Q(verified_at__isnull=False)),
-                name='wallettransaction_success_requires_timestamps',
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name='wallettransaction',
-            constraint=models.CheckConstraint(
-                check=models.Q(('status', 'FAILED'), _negated=True) | models.Q(failed_at__isnull=False),
-                name='wallettransaction_failed_requires_failed_at',
-            ),
         ),
         migrations.AddConstraint(
             model_name='wallettransaction',

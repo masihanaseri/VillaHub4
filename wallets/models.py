@@ -93,13 +93,13 @@ class Wallet(BaseModel):
 
         constraints = [
             models.CheckConstraint(
-                check=models.Q(balance__gte=0),
+                condition=models.Q(balance__gte=0),
                 name="wallet_balance_non_negative",
             ),
             # A resident/township wallet is scoped to exactly one owner;
             # the system wallet has neither.
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(wallet_type="SYSTEM")
                     | models.Q(wallet_type="TOWNSHIP", township__isnull=False)
                     | models.Q(wallet_type="RESIDENT", user__isnull=False)
@@ -109,9 +109,9 @@ class Wallet(BaseModel):
         ]
 
         indexes = [
-            models.Index(fields=["wallet_type", "is_active"]),
-            models.Index(fields=["user", "wallet_type"]),
-            models.Index(fields=["township", "wallet_type"]),
+            models.Index(fields=["wallet_type", "is_active"], name="wallets_type_active_idx"),
+            models.Index(fields=["user", "wallet_type"], name="wallets_user_type_idx"),
+            models.Index(fields=["township", "wallet_type"], name="wallets_township_type_idx"),
         ]
 
     def __str__(self):
@@ -146,6 +146,12 @@ class TransactionType(models.TextChoices):
 # ----------------------------------------
 
 class WalletTransaction(BaseModel):
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     class TransactionStatus(models.TextChoices):
         """
@@ -331,14 +337,14 @@ class WalletTransaction(BaseModel):
             # allowed (system-side failures), but SUCCESS always needs
             # paid_at + verified_at.
             models.CheckConstraint(
-                check=~models.Q(status="SUCCESS") | (
+                condition=~models.Q(status="SUCCESS") | (
                     models.Q(paid_at__isnull=False)
                     & models.Q(verified_at__isnull=False)
                 ),
                 name="wallettransaction_success_requires_timestamps",
             ),
             models.CheckConstraint(
-                check=~models.Q(status="FAILED") | models.Q(failed_at__isnull=False),
+                condition=~models.Q(status="FAILED") | models.Q(failed_at__isnull=False),
                 name="wallettransaction_failed_requires_failed_at",
             ),
             models.UniqueConstraint(
@@ -349,10 +355,10 @@ class WalletTransaction(BaseModel):
         ]
 
         indexes = [
-            models.Index(fields=["wallet", "status"]),
-            models.Index(fields=["wallet", "transaction_type"]),
-            models.Index(fields=["status", "created_at"]),
-            models.Index(fields=["gateway_ref_id"]),
+            models.Index(fields=["wallet", "status"], name="wallettxn_wallet_status_idx"),
+            models.Index(fields=["wallet", "transaction_type"], name="wallettxn_wallet_type_idx"),
+            models.Index(fields=["status", "created_at"], name="wallettxn_status_created_idx"),
+            models.Index(fields=["gateway_ref_id"], name="wallettxn_gateway_ref_idx"),
         ]
 
     def __str__(self):
@@ -404,6 +410,12 @@ class SettlementStatus(models.TextChoices):
 
 class Settlement(BaseModel):
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+
     wallet = models.ForeignKey(
         Wallet,
         on_delete=models.CASCADE,
@@ -449,6 +461,12 @@ class Settlement(BaseModel):
 
 class CommissionRule(BaseModel):
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+
     township = models.OneToOneField(
         "townships.Township",
         on_delete=models.CASCADE,
@@ -486,6 +504,12 @@ class CommissionRule(BaseModel):
 
 class CommissionTransaction(BaseModel):
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+
     wallet_transaction = models.OneToOneField(
         WalletTransaction,
         on_delete=models.CASCADE,
@@ -522,6 +546,12 @@ class CommissionTransaction(BaseModel):
 # ----------------------------------------
 
 class PaymentGateway(BaseModel):
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     name = models.CharField(max_length=100)
 
@@ -562,7 +592,7 @@ class PaymentGateway(BaseModel):
         ]
 
         indexes = [
-            models.Index(fields=["is_active", "priority"]),
+            models.Index(fields=["is_active", "priority"], name="paymentgw_active_priority_idx"),
         ]
 
     def __str__(self):
@@ -579,6 +609,12 @@ class PaymentGateway(BaseModel):
 # ----------------------------------------
 
 class GatewayTransaction(BaseModel):
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     wallet = models.ForeignKey(
         Wallet,
@@ -647,7 +683,7 @@ class GatewayTransaction(BaseModel):
         ]
 
         indexes = [
-            models.Index(fields=["gateway", "is_verified"]),
+            models.Index(fields=["gateway", "is_verified"], name="gatewaytxn_gateway_verif_idx"),
         ]
 
     def __str__(self):
@@ -660,6 +696,12 @@ class GatewayTransaction(BaseModel):
 # ----------------------------------------
 
 class GatewayCallback(BaseModel):
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     gateway_transaction = models.ForeignKey(
         GatewayTransaction,
@@ -691,6 +733,12 @@ class GatewayCallback(BaseModel):
 # ----------------------------------------
 
 class WithdrawalRequest(BaseModel):
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
 
     class Status(models.TextChoices):
 
@@ -770,7 +818,7 @@ class WithdrawalRequest(BaseModel):
         ]
 
         indexes = [
-            models.Index(fields=["wallet", "status"]),
+            models.Index(fields=["wallet", "status"], name="withdrawreq_wallet_status_idx"),
         ]
 
     def __str__(self):

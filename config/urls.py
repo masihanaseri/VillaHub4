@@ -134,7 +134,7 @@ urlpatterns = [
     ),
 
     path(
-        "api/wallets/",
+        "wallets/",
         include("wallets.urls"),
     ),
 

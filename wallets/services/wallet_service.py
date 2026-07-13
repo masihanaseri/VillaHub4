@@ -253,7 +253,16 @@ class WalletService:
             TransactionType.WITHDRAW,
             TransactionType.TRANSFER_OUT,
         )
-        after = before - locked_transaction.amount if is_debit else before + locked_transaction.amount
+        # PAYMENT records money that was settled directly between the
+        # gateway and the invoice/reservation being paid — it never
+        # touches the resident's spendable wallet balance. Only a
+        # later explicit refund (RefundService) credits the wallet.
+        if locked_transaction.transaction_type == TransactionType.PAYMENT:
+            after = before
+        elif is_debit:
+            after = before - locked_transaction.amount
+        else:
+            after = before + locked_transaction.amount
 
         if after < 0:
             raise InsufficientBalanceError(

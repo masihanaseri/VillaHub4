@@ -24,6 +24,10 @@ class WalletAdmin(admin.ModelAdmin):
 
     readonly_fields = ("uuid", "balance", "created_at", "updated_at")
 
+    # Avoids one extra query per row for `user`/`township` in the
+    # changelist (N+1) — both are rendered via list_display above.
+    list_select_related = ("user", "township")
+
 
 @admin.register(WalletTransaction)
 class WalletTransactionAdmin(admin.ModelAdmin):
@@ -63,6 +67,8 @@ class WalletTransactionAdmin(admin.ModelAdmin):
 
     date_hierarchy = "created_at"
 
+    list_select_related = ("wallet",)
+
 
 @admin.register(Settlement)
 class SettlementAdmin(admin.ModelAdmin):
@@ -72,6 +78,8 @@ class SettlementAdmin(admin.ModelAdmin):
     list_filter = ("status",)
 
     search_fields = ("tracking_code",)
+
+    list_select_related = ("wallet",)
 
 
 @admin.register(CommissionRule)
@@ -84,6 +92,8 @@ class CommissionRuleAdmin(admin.ModelAdmin):
 class CommissionTransactionAdmin(admin.ModelAdmin):
 
     list_display = ("id", "township", "amount", "percent", "created_at")
+
+    list_select_related = ("township",)
 
 
 @admin.register(PaymentGateway)
@@ -107,6 +117,8 @@ class GatewayTransactionAdmin(admin.ModelAdmin):
 
     readonly_fields = ("raw_request", "raw_response")
 
+    list_select_related = ("gateway",)
+
 
 @admin.register(GatewayCallback)
 class GatewayCallbackAdmin(admin.ModelAdmin):
@@ -114,6 +126,8 @@ class GatewayCallbackAdmin(admin.ModelAdmin):
     list_display = ("id", "gateway_transaction", "ip_address", "processed", "created_at")
 
     readonly_fields = ("raw_data",)
+
+    list_select_related = ("gateway_transaction",)
 
 
 @admin.register(WithdrawalRequest)
@@ -126,3 +140,5 @@ class WithdrawalRequestAdmin(admin.ModelAdmin):
     search_fields = ("wallet__user__username", "tracking_code", "bank_reference")
 
     readonly_fields = ("created_at", "updated_at")
+
+    list_select_related = ("wallet",)

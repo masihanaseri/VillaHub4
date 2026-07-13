@@ -239,7 +239,7 @@ class PaymentGatewayService:
             GatewayTransaction.objects.select_related(
                 "wallet_transaction", "gateway",
             )
-            .select_for_update()
+            .select_for_update(of=("self",))
             .get(authority=authority)
         )
 
@@ -267,7 +267,7 @@ class PaymentGatewayService:
             )
 
             if wallet_transaction is not None:
-                WalletService.fail_pending_transaction(
+                wallet_transaction = WalletService.fail_pending_transaction(
                     wallet_transaction,
                     reason="Cancelled by user on gateway.",
                     new_status=WalletTransaction.TransactionStatus.CANCELLED,
@@ -282,7 +282,7 @@ class PaymentGatewayService:
         if not gateway_transaction.is_success:
 
             if wallet_transaction is not None:
-                WalletService.fail_pending_transaction(
+                wallet_transaction = WalletService.fail_pending_transaction(
                     wallet_transaction,
                     reason="Gateway verification failed.",
                 )

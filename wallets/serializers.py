@@ -175,7 +175,21 @@ class GatewayCallbackSerializer(serializers.ModelSerializer):
 
         fields = "__all__"
 
-        read_only_fields = fields
+        # NOTE: this must be an explicit tuple, not a reference to the
+        # `fields` name above. `read_only_fields = fields` previously
+        # bound to the *string* "__all__" (DRF requires a list/tuple
+        # here), which raised `TypeError` the first time any view
+        # instantiated this serializer (e.g. GatewayCallbackViewSet.list()).
+        read_only_fields = (
+            "id",
+            "gateway_transaction",
+            "raw_data",
+            "ip_address",
+            "user_agent",
+            "processed",
+            "created_at",
+            "updated_at",
+        )
 
 
 class WithdrawalRequestSerializer(serializers.ModelSerializer):
@@ -189,6 +203,13 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "id",
             "wallet",
+            # `amount` is fixed at creation time (WithdrawalRequestCreateSerializer
+            # -> WithdrawalService.create_request, which validates it against
+            # the wallet's balance and the configured minimum). Leaving it
+            # writable here would let the owner of a still-PENDING request
+            # silently bump the amount after the fact, bypassing that
+            # validation right up until staff approves/pays it.
+            "amount",
             "status",
             "wallet_transaction",
             "approved_by",
