@@ -36,6 +36,8 @@ class User(AbstractUser):
         unique=True,
         db_index=True,
         verbose_name="شماره موبایل",
+        blank=False,
+        null=False,
     )
 
     active_township = models.ForeignKey(

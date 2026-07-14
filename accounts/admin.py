@@ -5,15 +5,58 @@ from .models import User, Role, Permission, Membership, Invitation
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ("username", "mobile", "active_township", "is_active", "is_staff", "date_joined")
-    list_filter = ("is_active", "is_staff", "active_township")
-    search_fields = ("username", "mobile", "first_name", "last_name")
+    list_display = (
+        "username",
+        "mobile",
+        "active_township",
+        "is_active",
+        "is_staff",
+        "date_joined",
+    )
+
+    list_filter = (
+        "is_active",
+        "is_staff",
+        "active_township",
+    )
+
+    search_fields = (
+        "username",
+        "mobile",
+        "first_name",
+        "last_name",
+    )
+
     ordering = ("-date_joined",)
 
     fieldsets = BaseUserAdmin.fieldsets + (
-        ("شهرک", {"fields": ("active_township",)}),
+        (
+            "اطلاعات اختصاصی",
+            {
+                "fields": (
+                    "mobile",
+                    "active_township",
+                )
+            },
+        ),
     )
 
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "mobile",
+                    "password1",
+                    "password2",
+                    "is_staff",
+                    "is_active",
+                ),
+            },
+        ),
+    )
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
